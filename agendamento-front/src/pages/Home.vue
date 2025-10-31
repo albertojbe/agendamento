@@ -8,12 +8,12 @@ const router = useRouter();
 onMounted(() => {
     const token = localStorage.getItem('authToken');
     if (!token) {
-        router.push('/');
+        router.push('/login');
     } else {
         api.post('/auth/validate', { token: token }).then((response) => {
             localStorage.setItem('user', JSON.stringify(response.data.user));
         }).catch((error) => {
-            router.push('/');
+            router.push('/login');
         });
     }
 });

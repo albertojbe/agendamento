@@ -20,7 +20,7 @@ function handleLogin() {
         }
     }).then((response) => {
         localStorage.setItem('authToken', response.data.token);
-        router.push('/home');
+        router.push('/');
         console.log(response.data.token);
     }).catch((error) => {
         errorText.value = 'Credenciais inválidas. Por favor, tente novamente.';
