@@ -19,6 +19,15 @@ router.post('/token', function(req, res, next) {
 }
 );
 
+router.post('/validate', function(req, res) {
+  try {
+    const payload = authService.verifyToken(req.body.token);
+    res.json({user: payload});
+  } catch (error) {
+    res.status(401).json({ message: error.message });
+  }
+});
+
 
 
 module.exports = router;
