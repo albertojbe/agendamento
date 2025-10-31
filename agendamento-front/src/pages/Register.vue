@@ -1,4 +1,40 @@
 <script setup>
+import { reactive } from 'vue';
+import api from '../config/api';
+
+const userData = {
+    name: '',
+    email: '',
+    password: ''
+};
+
+const messages = reactive({
+    success: '',
+    error: ''
+});
+
+function handleRegister() {
+    messages.success = '';
+    messages.error = '';
+    // Implement registration logic here
+    api.post('/users', userData, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((response) => {
+        if (response.status === 201) {
+            messages.success = 'Conta criada com sucesso! Você já pode entrar.';
+            userData.name = '';
+            userData.email = '';
+            userData.password = '';
+        } else {
+            messages.error = 'Ocorreu um erro ao criar a conta. Por favor, tente novamente.';
+        }
+    }).catch((error) => {
+        messages.error = error.response?.data?.message || 'Ocorreu um erro ao criar a conta. Por favor, tente novamente.';
+    });
+};
+
 
 </script>
 
@@ -24,18 +60,19 @@
                     <form class="mb-4 space-y-4" onsubmit="return false;">
                         <div>
                             <label class="label-text" for="userName">Nome*</label>
-                            <input type="text" placeholder="Digite seu nome completo" class="input" id="userName"
-                                required />
+                            <input type="text" v-model="userData.name" placeholder="Digite seu nome completo"
+                                class="input" id="userName" required />
                         </div>
                         <div>
                             <label class="label-text" for="userEmail">Email*</label>
-                            <input type="email" placeholder="Digite seu endreço de email" class="input" id="userEmail"
-                                required />
+                            <input type="email" v-model="userData.email" placeholder="Digite seu endreço de email"
+                                class="input" id="userEmail" required />
                         </div>
                         <div>
                             <label class="label-text" for="userPassword">Senha*</label>
                             <div class="input">
-                                <input id="userPassword" type="password" placeholder="············" required />
+                                <input id="userPassword" v-model="userData.password" type="password"
+                                    placeholder="············" required />
                                 <button type="button" data-toggle-password='{ "target": "#userPassword" }'
                                     class="block cursor-pointer" aria-label="userPassword">
                                     <span
@@ -45,6 +82,13 @@
                                 </button>
                             </div>
                         </div>
+                        <div v-show="messages.success" class="alert alert-outline alert-success" role="alert">
+                            {{ messages.success }}
+                        </div>
+                        <div v-show="messages.error" class="alert alert-outline alert-warning" role="alert">
+                            {{ messages.error }}
+                        </div>
+
                         <!-- <div class="flex items-center justify-between gap-y-2">
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" class="checkbox checkbox-primary" id="rememberMe" />
@@ -53,7 +97,8 @@
                             </div>
                             <a href="#" class="link link-animated link-primary font-normal">Forgot Password?</a>
                         </div> -->
-                        <button class="btn btn-lg btn-primary btn-gradient btn-block">Criar Conta</button>
+                        <button @click.prevent="handleRegister"
+                            class="btn btn-lg btn-primary btn-gradient btn-block">Criar Conta</button>
                     </form>
                     <p class="text-base-content/80 mb-4 text-center">
                         <router-link to="/" class="link link-animated link-primary font-normal">Entrar</router-link>
