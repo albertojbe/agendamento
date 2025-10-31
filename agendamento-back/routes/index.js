@@ -1,9 +1,12 @@
 var express = require('express');
+const { validateJWT } = require('../middlewares/authMiddleware');
 var router = express.Router();
 
+router.use(validateJWT);
+
 /* GET home page. */
-router.get('/', (req, res, next) => {
-  res.send('Hello World!')
+router.get('/', function(req, res) {
+  res.status(200).json({ status: 'API is running' });
 });
 
 
