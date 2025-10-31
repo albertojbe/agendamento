@@ -2,5 +2,8 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import "flyonui/flyonui";
+import router from './routes/index.js';
 
-createApp(App).mount('#app')
+const app = createApp(App);
+
+createApp(App).use(router).mount('#app')
