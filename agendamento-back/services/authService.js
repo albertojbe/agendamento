@@ -2,13 +2,8 @@ const jwt = require('jsonwebtoken');
 const userService = require('./userService');
 const bcrypt = require('bcrypt');
 
-const SALT_ROUNDS = 10;
 const EXPIRE_TIME = '1h';
 
-exports.hashPassword = async function (password) {
-  const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-  return hashedPassword;
-};
 
 exports.generateToken = async function (userCredentials) {
   const { email, password } = userCredentials;

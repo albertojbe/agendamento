@@ -4,7 +4,7 @@ var router = express.Router();
 const userService = require('../services/userService');
 
 // Find User by ID
-router.get('/:id', function(req, res, next) {
+router.get('/:id', function (req, res, next) {
   try {
     const userId = req.params.id;
     userService.findUserById(userId)
@@ -21,22 +21,26 @@ router.get('/:id', function(req, res, next) {
 });
 
 
-// Create User
-router.post('/', function(req, res, next) {
+// Register User
+router.post('/', async function (req, res, next) {
   try {
     const userDTO = userService.createUserDTO(req.body);
-    console.log(userDTO);
-    userService.createUser(userDTO)
-      .then(newUser => {
-        res.status(201).json(newUser);
-      })
+    const newUser = await userService.createUser(userDTO);
+    res.status(201).json(newUser);
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    if (error.status === 409) {
+      res.status(409).json({ message: error.message });
+    } else {
+      console.error(error);
+      res.status(500).json({ message: 'Erro ao criar usuário' });
+    }
   }
 });
 
+
 // Update User
-router.put('/:id', function(req, res, next) {
+router.put('/:id', function (req, res, next) {
   try {
     const userId = req.params.id;
     const userDTO = userService.createUserDTO(req.body);
@@ -54,7 +58,7 @@ router.put('/:id', function(req, res, next) {
 });
 
 // Delete User
-router.delete('/:id', function(req, res, next) {
+router.delete('/:id', function (req, res, next) {
   try {
     const userId = req.params.id;
     userService.deleteUser(userId)
@@ -63,8 +67,9 @@ router.delete('/:id', function(req, res, next) {
           res.json({ message: 'User deleted successfully' });
         } else {
           res.status(404).json({ message: 'User not found' });
-        }})
-      } catch (error) {
+        }
+      })
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });

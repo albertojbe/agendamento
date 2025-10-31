@@ -19,6 +19,7 @@ router.post('/token', function(req, res, next) {
 }
 );
 
+// Validate token and get user info
 router.post('/validate', function(req, res) {
   try {
     const payload = authService.verifyToken(req.body.token);

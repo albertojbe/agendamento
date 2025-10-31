@@ -1,17 +1,24 @@
 const User = require('../models/userModel');
-const { hashPassword } = require('./authService');
+const { hashPassword } = require('../utils/authUtils');
 
-const SALT_ROUNDS = 10;
-
-exports.createUser = async function(userDTO) {
-    try {
-        const hashedPassword = await bcrypt.hash(userDTO.password, SALT_ROUNDS);
-        userDTO.password = hashedPassword;
-        return (await User.create(userDTO)).toJSON();
-    } catch(error) {
-        throw new Error('Erro ao cadastrar usuário: ' + error.message)
+exports.createUser = async function (userDTO) {
+  try {
+    const existingUser = await User.findOne({ where: { email: userDTO.email } });
+    if (existingUser) {
+      const error = new Error('Email já cadastrado');
+      error.status = 409;
+      throw error;
     }
+
+    userDTO.password = await hashPassword(userDTO.password);
+    const newUser = await User.create(userDTO);
+    return newUser.toJSON();
+
+  } catch (error) {
+    throw error;
+  }
 }
+
 
 exports.updateUser = async function(id, userDTO) {
     try {
