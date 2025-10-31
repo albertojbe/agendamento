@@ -1,11 +1,27 @@
 <script setup>
-console.log(localStorage.getItem('authToken'));
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import api from '../config/api';
+
+const router = useRouter();
+
+onMounted(() => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        router.push('/');
+    } else {
+        api.post('/auth/validate', { token: token }).then((response) => {
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+        }).catch((error) => {
+            router.push('/');
+        });
+    }
+});
 </script>
 
 <template>
     <div data-theme="light" style="height: 100vh;">
-        <nav j
-            class="navbar rounded-box flex w-full items-center justify-between gap-2 shadow-base-300/20 shadow-sm">
+        <nav j class="navbar rounded-box flex w-full items-center justify-between gap-2 shadow-base-300/20 shadow-sm">
             <div class="navbar-start max-md:w-1/4">
                 <a class="link text-base-content link-neutral text-xl font-bold no-underline" href="#">
                     Agendamento

@@ -1,5 +1,5 @@
 <script setup>
-import axios from 'axios';
+import api from '../config/api';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -14,13 +14,14 @@ const errorText = ref('');
 
 function handleLogin() {
     errorText.value = '';
-    axios.post('http://localhost:3000/auth/token', userCredentials, {
+    api.post('/auth/token', userCredentials, {
         headers: {
             'Content-Type': 'application/json'
         }
     }).then((response) => {
         localStorage.setItem('authToken', response.data.token);
         router.push('/home');
+        console.log(response.data.token);
     }).catch((error) => {
         errorText.value = 'Credenciais inválidas. Por favor, tente novamente.';
     });
