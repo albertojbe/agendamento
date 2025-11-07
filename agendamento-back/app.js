@@ -8,6 +8,9 @@ var cors = require('cors')
 
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/userRouter');
+var authRouter = require('./routes/authRouter');
+var roomRouter = require('./routes/roomRouter');
+var eventRouter = require('./routes/eventRouter');
 
 (() => {
     const db = require('./config/db')
@@ -28,6 +31,8 @@ app.use(cors({
 
 app.use('/status', indexRouter);
 app.use('/users', userRouter);
-app.use('/auth', require('./routes/authRouter'));
+app.use('/auth', authRouter);
+app.use('/rooms', roomRouter);
+app.use('/events', eventRouter);
 
 module.exports = app;

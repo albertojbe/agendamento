@@ -1,4 +1,14 @@
-const Room = require('../models/Room');
+const Room = require('../models/roomModel');
+
+
+exports.getAllRooms = async function() {
+    try {
+        const rooms = await Room.findAll();
+        return rooms.map(room => room.toJSON());
+    } catch(error) {
+        throw new Error('Erro ao buscar salas: ' + error.message)
+    }
+}
 
 exports.createRoom = async function (roomDTO) {
   try {
