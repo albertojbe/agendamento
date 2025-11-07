@@ -1,10 +1,23 @@
 import { createWebHistory, createRouter } from 'vue-router'
-import Home from '../pages/Home.vue';
-import Login from '../pages/Login.vue';
-import Register from '../pages/Register.vue';
+import Home from '../views/Home.vue';
+import Login from '../views/Login.vue';
+import Register from '../views/Register.vue';
+import Rooms from '../pages/Rooms.vue';
+import Schedules from '../pages/Schedules.vue';
 
 const routes = [
-  { path: '/', component: Home },
+  {
+    path: '/', component: Home, redirect: '/agendamentos', children: [
+      {
+        path: 'salas',
+        component: Rooms
+      },
+      {
+        path: 'agendamentos',
+        component: Schedules
+      }
+    ]
+  },
   { path: '/login', component: Login },
   { path: '/registrar', component: Register },
 ]
