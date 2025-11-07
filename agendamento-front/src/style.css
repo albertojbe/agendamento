@@ -2,3 +2,6 @@
 @plugin "flyonui";
 @import "flyonui/variants.css";
 @source "../node_modules/flyonui/flyonui.js";
+@plugin "@iconify/tailwind4";
+
+@import "flyonui/src/vendor/fullcalendar.css";

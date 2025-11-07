@@ -9,6 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
+    "@fullcalendar/timegrid": "^6.1.19",
+    "@fullcalendar/timeline": "^6.1.19",
+    "@fullcalendar/vue3": "^6.1.19",
     "@tailwindcss/vite": "^4.1.16",
     "axios": "^1.13.1",
     "flyonui": "^2.4.1",
@@ -17,6 +23,8 @@
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
+    "@iconify/json": "^2.2.404",
+    "@iconify/tailwind4": "^1.1.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "vite": "^7.1.7"
   }
