@@ -1,32 +1,157 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import api from '../config/api';
-import CalendarComponent from '../components/CalendarComponent.vue';
-import RowOptions from '../components/shared/RowOptions.vue';
 
-const rooms = ref([])
+const events = ref([]);
+const rooms = ref([]);
 
-onMounted(async () => {
+const eventForm = ref({
+  title: '',
+  roomId: null,
+  start: '',
+  end: ''
+});
+
+const fetchRooms = async () => {
   try {
-    const response = await api.get('/rooms')
-    rooms.value = response.data
-    for (const room of rooms.value) {
-      console.log(room.name)
-    }
-  } catch (err) {
-    console.error('Erro ao buscar salas:', err)
+    const response = await api.get('/rooms');
+    rooms.value = response.data;
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
   }
-})
+};
+
+const fetchEvents = async () => {
+  try {
+    const response = await api.get('/events');
+    events.value = response.data;
+  } catch (error) {
+    console.error('Error fetching events:', error);
+  }
+};
+
+const createEvent = async () => {
+  try {
+    if (!eventForm.value.title || !eventForm.value.roomId || !eventForm.value.start || !eventForm.value.end) {
+      return alert('Título, sala, início e fim são obrigatórios.');
+    }
+
+    const payload = {
+      title: eventForm.value.title,
+      roomId: Number(eventForm.value.roomId),
+      start: eventForm.value.start,
+      end: eventForm.value.end
+    };
+
+    const response = await api.post('/events', payload);
+    events.value.push(response.data);
+
+    // reset form
+    eventForm.value.title = '';
+    eventForm.value.roomId = null;
+    eventForm.value.start = '';
+    eventForm.value.end = '';
+
+    const overlay = document.querySelector('#event-modal');
+    if (overlay) {
+      overlay.classList.remove('overlay-open');
+      overlay.classList.add('hidden');
+    }
+  } catch (error) {
+    console.error('Error creating event:', error);
+    alert(error.response?.data?.message || 'Erro ao criar evento');
+  }
+};
+
+const deleteEvent = async (eventId) => {
+  try {
+    await api.delete(`/events/${eventId}`);
+    events.value = events.value.filter(event => event.id !== eventId);
+  } catch (error) {
+    console.error('Error deleting event:', error);
+  }
+};
+
+onMounted(() => {
+  fetchRooms();
+  fetchEvents();
+});
 </script>
 
 <template>
-    <div class="container mx-auto my-10 bg-base-100 shadow-base-300/20 shadow-sm p-10 rounded-2xl gap-7"
-        style="display: flex; flex-direction: row; max-height: 85vh;">
-        <div class="flex mt-15">
-            <RowOptions :rooms="rooms" />
+    <div class="container mx-auto flex flex-row justify-end mb-4">
+        <button class="btn btn-primary btn-gradient" type="button" data-overlay="#event-modal">
+          Adicionar Evento
+        </button>
+    </div>
+
+    <div id="event-modal" class="overlay modal overlay-open:opacity-100 hidden overlay-open:duration-300" role="dialog" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Criar evento</h3>
+            <button type="button" class="btn btn-text btn-circle btn-sm absolute end-3 top-3" aria-label="Close" data-overlay="#event-modal">
+              <span class="icon-[tabler--x] size-4"></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="w-96 space-y-4">
+              <div>
+                <label class="label-text" for="eventTitle">Título do evento*</label>
+                <input id="eventTitle" v-model="eventForm.title" type="text" placeholder="Reunião de Projeto" class="input" />
+              </div>
+              <div>
+                <label class="label-text" for="eventRoom">Sala*</label>
+                <select id="eventRoom" v-model="eventForm.roomId" class="select w-full">
+                  <option value="" disabled>Selecione uma sala</option>
+                  <option v-for="r in rooms" :key="r.id" :value="r.id">{{ r.name }}</option>
+                </select>
+              </div>
+              <div>
+                <label class="label-text" for="eventStart">Início*</label>
+                <input id="eventStart" v-model="eventForm.start" type="datetime-local" class="input" />
+              </div>
+              <div>
+                <label class="label-text" for="eventEnd">Fim*</label>
+                <input id="eventEnd" v-model="eventForm.end" type="datetime-local" class="input" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-soft btn-secondary" data-overlay="#event-modal">Fechar</button>
+            <button type="button" class="btn btn-primary" @click="createEvent" data-overlay="#event-modal">Salvar</button>
+          </div>
         </div>
-        <div class="w-full max-h-[90%] overflow-auto">
-            <CalendarComponent />
+      </div>
+    </div>
+
+    <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md">
+        <div class="overflow-x-auto">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Sala</th>
+                        <th>Ínicio</th>
+                        <th>Fim</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="event in events" :key="event.id">
+                        <td>{{ event.title }}</td>
+                        <td>{{ (rooms.find(r => r.id === event.roomId) || {}).name || event.roomId }}</td>
+                        <td>{{ event.start }}</td>
+                        <td>{{ event.end }}</td>
+                        <td>
+                            <button class="btn btn-circle btn-text btn-sm" aria-label="Editar evento"><span
+                                    class="icon-[tabler--pencil] size-5"></span></button>
+                            <button @click="deleteEvent(event.id)" class="btn btn-circle btn-text btn-sm" aria-label="Excluir evento"><span
+                                    class="icon-[tabler--trash] size-5"></span></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </template>

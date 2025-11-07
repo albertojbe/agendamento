@@ -20,7 +20,7 @@ onMounted(() => {
         <ul>
             <li v-for="room in props.rooms" :key="room.id">
                 <button type="button"
-                    class="btn btn-primary active-tab:bg-primary active-tab:text-white hover:text-primary hover:bg-primary/20 w-full"
+                    class="btn btn-primary active-tab:bg-primary py-8 active-tab:text-white hover:text-primary hover:bg-primary/20 w-full"
                     :id="`tabs-pill-vertical-item-${room.id}`" :data-tab="`#tabs-pill-vertical-${room.id}`" role="tab">
                     {{ room.name }}
                 </button>

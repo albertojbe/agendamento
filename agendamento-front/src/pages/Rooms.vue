@@ -94,7 +94,6 @@ onMounted(() => {
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-soft btn-secondary" data-overlay="#room-modal">Fechar</button>
-            <!-- salva e fecha o modal -->
             <button type="button" class="btn btn-primary" @click="createRoom" data-overlay="#room-modal">Salvar</button>
           </div>
         </div>
