@@ -1,10 +1,10 @@
 const db = require('../config/db');
 const { DataTypes } = require('sequelize');
 
-const Room = require('./roomModel')(db, DataTypes);
-const Event = require('./eventModel')(db, DataTypes);
-const User = require('./userModel')(db, DataTypes);
-const Resource = require('./resourceModel')(db, DataTypes);
+const Room = require('./roomModel');
+const Event = require('./eventModel');
+const User = require('./userModel');
+const Resource = require('./resourceModel');
 
 Room.hasMany(Resource, {
     foreignKey: 'roomId',
@@ -37,6 +37,18 @@ Event.belongsTo(require('./userModel'), {
     foreignKey: 'userId',
     as: 'user',
     onDelete: 'CASCADE',
+});
+
+Event.belongsToMany(Resource, {
+    through: 'EventResources',
+    as: 'resources',
+    foreignKey: 'eventId',
+});
+
+Resource.belongsToMany(Event, {
+    through: 'EventResources',
+    as: 'events',
+    foreignKey: 'resourceId',
 });
 
 module.exports = { db, Room, Event, User };
