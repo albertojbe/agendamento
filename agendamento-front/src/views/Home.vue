@@ -31,6 +31,7 @@ onMounted(() => {
         <ul class="menu menu-horizontal p-0 font-medium">
           <li><RouterLink to="/agendamentos">Agendamentos</RouterLink></li>
           <li><RouterLink to="/salas">Salas</RouterLink></li>
+          <li><RouterLink to="/recursos">Recursos</RouterLink></li>
         </ul>
       </div>
       <div class="navbar-end items-center gap-4">

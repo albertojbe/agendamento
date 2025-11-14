@@ -4,6 +4,7 @@ import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
 import Rooms from '../pages/Rooms.vue';
 import Schedules from '../pages/Schedules.vue';
+import Resources from '../pages/Resources.vue';
 
 const routes = [
   {
@@ -15,6 +16,10 @@ const routes = [
       {
         path: 'agendamentos',
         component: Schedules
+      },
+      {
+        path: 'recursos',
+        component: Resources
       }
     ]
   },
