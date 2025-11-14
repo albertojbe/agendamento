@@ -13,11 +13,6 @@ Resource.init({
         allowNull: false,
         defaultValue: 1,
     },
-    availableQuantity: {
-        type: db.Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
-    },
     type: {
         type: db.Sequelize.STRING,
         allowNull: false,

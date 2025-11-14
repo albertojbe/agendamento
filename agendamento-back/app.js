@@ -11,6 +11,7 @@ var userRouter = require('./routes/userRouter');
 var authRouter = require('./routes/authRouter');
 var roomRouter = require('./routes/roomRouter');
 var eventRouter = require('./routes/eventRouter');
+var resourceRouter = require('./routes/resourceRouter');
 
 (() => {
     const db = require('./config/db')
@@ -34,5 +35,6 @@ app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/rooms', roomRouter);
 app.use('/events', eventRouter);
+app.use('/resources', resourceRouter);
 
 module.exports = app;
