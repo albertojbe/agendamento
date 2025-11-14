@@ -20,6 +20,11 @@ Event.init({
         type: DataTypes.TEXT,
         allowNull: true,
     },
+    participantsQuantity: {
+        type: DataTypes.INTEGER,
+        defaultValue: 1,
+        allowNull: false,
+    },
     roomId: {
         type: DataTypes.INTEGER,
         allowNull: false,
