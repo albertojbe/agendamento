@@ -1,13 +1,13 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import api from '../config/api';
 
 const resources = ref([]);
 
-const resourceForm = ref({
+const resourceForm = reactive({
   name: '',
-  isActive: true,
   quantity: 1,
+  isActive: true,
 });
 
 const fetchResources = async () => {
@@ -19,9 +19,11 @@ const fetchResources = async () => {
   }
 };
 
+
+
 const createResource = async () => {
   try {
-    await api.post('/resources', resourceForm.value);
+    await api.post('/resources', resourceForm);
     fetchResources();
     resourceForm.value = { name: '', isActive: true, quantity: 1 };
   } catch (error) {
@@ -32,6 +34,7 @@ const createResource = async () => {
 onMounted(() => {
   fetchResources();
 });
+
 </script>
 
 <template>
@@ -40,56 +43,51 @@ onMounted(() => {
       Recursos
     </h1>
   </header>
-  <div class="container mx-auto flex flex-row justify-end mb-4">
-    <button class="btn btn-primary btn-gradient" type="button" data-overlay="#event-modal">
-      Adicionar Evento
-    </button>
-  </div>
 
-  <div id="event-modal" class="overlay modal overlay-open:opacity-100 hidden overlay-open:duration-300" role="dialog"
-    tabindex="-1">
+  <div id="createResourceModal"
+    class="overlay modal overlay-open:opacity-100 overlay-open:duration-300 hidden [--has-autofocus:false]"
+    role="dialog" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="modal-title">Criar evento</h3>
+          <h3 class="modal-title">Adicionar Recurso</h3>
           <button type="button" class="btn btn-text btn-circle btn-sm absolute end-3 top-3" aria-label="Close"
-            data-overlay="#event-modal">
+            data-overlay="#createResourceModal">
             <span class="icon-[tabler--x] size-4"></span>
           </button>
         </div>
-        <div class="modal-body">
-          <div class="w-96 space-y-4">
-            <div>
-              <label class="label-text" for="eventTitle">Título do evento*</label>
-              <input id="eventTitle" v-model="eventForm.title" type="text" placeholder="Reunião de Projeto"
-                class="input" />
+        <form>
+          <div class="modal-body pt-0">
+            <div class="mb-4">
+              <label class="label-text" for="modalFullName"> Nome </label>
+              <input type="text" placeholder="Projetor" class="input" id="modalFullName" v-model="resourceForm.name" autofocus />
             </div>
-            <div>
-              <label class="label-text" for="eventRoom">Sala*</label>
-              <select id="eventRoom" v-model="eventForm.roomId" class="select w-full">
-                <option value="" disabled>Selecione uma sala</option>
-                <option v-for="r in rooms" :key="r.id" :value="r.id">{{ r.name }}</option>
-              </select>
+            <div class="mb-0.5">
+              <label class="label-text" for="modalEmail"> Quantidade </label>
+              <input type="number" placeholder="1" class="input" id="modalEmail" v-model="resourceForm.quantity" />
             </div>
-            <div>
-              <label class="label-text" for="eventStart">Início*</label>
-              <input id="eventStart" v-model="eventForm.start" type="datetime-local" class="input" />
-            </div>
-            <div>
-              <label class="label-text" for="eventEnd">Fim*</label>
-              <input id="eventEnd" v-model="eventForm.end" type="datetime-local" class="input" />
+            <div class="mb-0.5 mt-5 flex flex-row items-center gap-2">
+              <label class="label-text font-semibold" for="modalIsActive"> Ativo </label>
+              <input type="checkbox" class="checkbox" id="modalIsActive" v-model="resourceForm.isActive" />
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-soft btn-secondary" data-overlay="#event-modal">Fechar</button>
-          <button type="button" class="btn btn-primary" @click="createEvent" data-overlay="#event-modal">Salvar</button>
-        </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-soft btn-secondary" data-overlay="#createResourceModal">Fechar</button>
+            <button type="submit" @click.prevent="createResource" class="btn btn-primary">Enviar</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 
-  <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md">
+  <div class="container mx-auto flex flex-row justify-end mb-4">
+    <button class="btn btn-primary btn-gradient" type="button" data-overlay="#createResourceModal">
+      Adicionar Recurso
+    </button>
+  </div>
+
+
+  <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md min-h-[60vh]">
     <div class="overflow-x-auto">
       <table class="table">
         <thead>
@@ -101,16 +99,15 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="event in events" :key="event.id">
-            <td>{{ event.title }}</td>
-            <td>{{rooms.find(r => r.id === event.roomId)?.name || event.roomId}}</td>
-            <td>{{ event.start }}</td>
-            <td>{{ event.end }}</td>
+          <tr v-for="resource in resources" :key="resource.id">
+            <td>{{ resource.name }}</td>
+            <td>{{ resource.isActive }}</td>
+            <td>{{ resource.quantity }}</td>
             <td>
               <button class="btn btn-circle btn-text btn-sm" aria-label="Editar evento"><span
                   class="icon-[tabler--pencil] size-5"></span></button>
-              <button @click="deleteEvent(event.id)" class="btn btn-circle btn-text btn-sm"
-                aria-label="Excluir evento"><span class="icon-[tabler--trash] size-5"></span></button>
+              <button @click="" class="btn btn-circle btn-text btn-sm" aria-label="Excluir evento"><span
+                  class="icon-[tabler--trash] size-5"></span></button>
             </td>
           </tr>
         </tbody>

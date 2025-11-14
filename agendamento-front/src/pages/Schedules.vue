@@ -133,7 +133,7 @@ onMounted(() => {
     </div>
   </div>
 
-  <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md">
+  <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md min-h-[60vh]">
     <div class="overflow-x-auto">
       <table class="table">
         <thead>
