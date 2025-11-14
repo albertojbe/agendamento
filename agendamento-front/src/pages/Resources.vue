@@ -2,86 +2,42 @@
 import { ref, onMounted } from 'vue';
 import api from '../config/api';
 
-const events = ref([]);
-const rooms = ref([]);
+const resources = ref([]);
 
-const eventForm = ref({
-  title: '',
-  roomId: null,
-  start: '',
-  end: ''
+const resourceForm = ref({
+  name: '',
+  isActive: true,
+  quantity: 1,
 });
 
-const fetchRooms = async () => {
+const fetchResources = async () => {
   try {
-    const response = await api.get('/rooms');
-    rooms.value = response.data;
+    const response = await api.get('/resources');
+    resources.value = response.data;
   } catch (error) {
-    console.error('Error fetching rooms:', error);
+    console.error('Erro ao buscar recursos:', error);
   }
 };
 
-const fetchEvents = async () => {
+const createResource = async () => {
   try {
-    const response = await api.get('/events');
-    events.value = response.data;
+    await api.post('/resources', resourceForm.value);
+    fetchResources();
+    resourceForm.value = { name: '', isActive: true, quantity: 1 };
   } catch (error) {
-    console.error('Error fetching events:', error);
-  }
-};
-
-const createEvent = async () => {
-  try {
-    if (!eventForm.value.title || !eventForm.value.roomId || !eventForm.value.start || !eventForm.value.end) {
-      return alert('Título, sala, início e fim são obrigatórios.');
-    }
-
-    const payload = {
-      title: eventForm.value.title,
-      roomId: Number(eventForm.value.roomId),
-      start: eventForm.value.start,
-      end: eventForm.value.end
-    };
-
-    const response = await api.post('/events', payload);
-    events.value.push(response.data);
-
-    // reset form
-    eventForm.value.title = '';
-    eventForm.value.roomId = null;
-    eventForm.value.start = '';
-    eventForm.value.end = '';
-
-    const overlay = document.querySelector('#event-modal');
-    if (overlay) {
-      overlay.classList.remove('overlay-open');
-      overlay.classList.add('hidden');
-    }
-  } catch (error) {
-    console.error('Error creating event:', error);
-    alert(error.response?.data?.message || 'Erro ao criar evento');
-  }
-};
-
-const deleteEvent = async (eventId) => {
-  try {
-    await api.delete(`/events/${eventId}`);
-    events.value = events.value.filter(event => event.id !== eventId);
-  } catch (error) {
-    console.error('Error deleting event:', error);
+    console.error('Erro ao criar recurso:', error);
   }
 };
 
 onMounted(() => {
-  fetchRooms();
-  fetchEvents();
+  fetchResources();
 });
 </script>
 
 <template>
   <header class="w-full py-6">
     <h1 class="text-2xl font-semibold text-gray-800 text-start">
-      Agendamentos
+      Recursos
     </h1>
   </header>
   <div class="container mx-auto flex flex-row justify-end mb-4">
@@ -138,10 +94,9 @@ onMounted(() => {
       <table class="table">
         <thead>
           <tr>
-            <th>Título</th>
-            <th>Sala</th>
-            <th>Ínicio</th>
-            <th>Fim</th>
+            <th>Nome</th>
+            <th>Ativo</th>
+            <th>Quantidade</th>
             <th>Ações</th>
           </tr>
         </thead>
