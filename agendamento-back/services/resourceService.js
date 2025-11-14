@@ -52,7 +52,6 @@ exports.createResourceDTO = function(resourceData) {
     return {
         name: resourceData.name,
         quantity: resourceData.quantity,
-        type: resourceData.type,
-        active: resourceData.active
+        isActive: resourceData.isActive
     }
 }

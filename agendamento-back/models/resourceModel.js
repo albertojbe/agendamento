@@ -13,11 +13,7 @@ Resource.init({
         allowNull: false,
         defaultValue: 1,
     },
-    type: {
-        type: db.Sequelize.STRING,
-        allowNull: false,
-    },
-    active: {
+    isActive: {
         type: db.Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
