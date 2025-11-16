@@ -79,12 +79,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="w-full py-6">
-    <h1 class="text-2xl font-semibold text-gray-800 text-start">
-      Agendamentos
-    </h1>
-  </header>
-  <div class="container mx-auto flex flex-row justify-end mb-4">
+  
+  <div class="container mx-auto flex flex-row items-center justify-between mb-4">
+    <div>
+      <h1 class="text-2xl font-semibold">Agendamentos</h1>
+      <p class="text-sm text-gray-500 mt-1">Gerencie agendamentos para os eventos — edite ou adicione novos.</p>
+    </div>
     <button class="btn btn-primary btn-gradient" type="button" data-overlay="#event-modal">
       Adicionar Evento
     </button>

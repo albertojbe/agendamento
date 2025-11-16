@@ -101,12 +101,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="w-full py-6">
-    <h1 class="text-2xl font-semibold text-gray-800 text-start">
-      Recursos
-    </h1>
-  </header>
-
   <div id="createResourceModal"
     class="overlay modal overlay-open:opacity-100 overlay-open:duration-300 hidden [--has-autofocus:false]"
     role="dialog" tabindex="-1">
@@ -145,26 +139,32 @@ onMounted(() => {
     </div>
   </div>
 
-  <div class="container mx-auto flex flex-row justify-end mb-4">
-    <button @click="resetForm" class="btn btn-primary btn-gradient" type="button" data-overlay="#createResourceModal">
-      Adicionar Recurso
-    </button>
-  </div>
+  <header class="container mx-auto flex items-center justify-between mb-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-800">Recursos</h1>
+      <p class="text-sm text-gray-500 mt-1">Gerencie recursos para os eventos — edite ou adicione novos.</p>
+    </div>
+    <div>
+      <button @click="resetForm" class="btn btn-primary btn-gradient" type="button" data-overlay="#createResourceModal">
+        Adicionar Recurso
+      </button>
+    </div>
+  </header>
 
-  <div class="rounded-box shadow-base-300/10 bg-base w-full pb-2 shadow-md min-h-[60vh]">
+  <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md min-h-[60vh]">
     <div class="overflow-x-auto">
       <!-- Colgroup com larguras relativas; table-layout: fixed controlará o comportamento responsivo -->
       <table class="table responsive-table w-full">
         <thead>
-          <tr>
-            <th class="py-2 px-3 text-center">Nome</th>
-            <th class="py-2 px-3 text-center">Ativo</th>
-            <th class="py-2 px-3 text-center">Quantidade</th>
-            <th class="py-2 px-3 text-center">Ações</th>
+          <tr class="text-center">
+            <th class="py-2 px-3 font-semibold">Nome</th>
+            <th class="py-2 px-3 font-semibold">Ativo</th>
+            <th class="py-2 px-3 font-semibold">Quantidade</th>
+            <th class="py-2 px-3 font-semibold">Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="resource in resources" :key="resource.id" class="text-center">
+          <tr v-for="resource in resources" :key="resource.id" class="text-center text-gray-600">
             <td class="py-2 px-3">
               <div class="w-full" v-if="resource.editing">
                 <input v-model="resource._edit.name" class="input input-sm" />
@@ -203,7 +203,7 @@ onMounted(() => {
                   <span class="icon-[tabler--pencil] size-5"></span>
                 </button>
                 <button @click="deleteResource(resource.id)" class="btn btn-circle btn-text btn-sm" aria-label="Excluir recurso">
-                  <span class="icon-[tabler--trash] size-5"></span>
+                  <span class="icon-[tabler--trash] size-5" data-overlay="#createResourceModal"></span>
                 </button>
               </div>
             </td>
