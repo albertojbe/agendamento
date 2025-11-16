@@ -5,6 +5,12 @@ import api from '../config/api';
 
 const router = useRouter();
 
+function handleLogout() {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('user');
+  router.push('/login');
+}
+
 onMounted(() => {
   const token = localStorage.getItem('authToken');
   if (!token) {
@@ -18,12 +24,12 @@ onMounted(() => {
       router.push('/login');
     });
   }
-
 });
+
 </script>
 
 <template>
-  <div data-theme="light" style="height: 100vh;">
+  <div data-theme="light" class="bg-base-200" style="height: 100vh;">
     <nav j class="navbar rounded-box flex w-full items-center justify-between gap-2 shadow-base-300/20 shadow-sm px-40">
       <div class="navbar-start max-md:w-1/4">
         <a class="link text-base-content link-neutral text-xl font-bold no-underline" href="#">
@@ -43,12 +49,12 @@ onMounted(() => {
           </li>
         </ul>
       </div>
-      <a class="btn max-md:btn-square btn-primary" href="#">
+      <button @click="handleLogout" class="btn max-md:btn-square btn-primary" href="#">
         <span class="max-md:hidden">Sair</span>
-      </a>
+      </button>
     </nav>
     <main>
-      <div class="container my-15 mx-auto">
+      <div class="container my-5 mx-auto">
         <RouterView />
       </div>
     </main>
