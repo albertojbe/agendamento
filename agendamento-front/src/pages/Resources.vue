@@ -29,7 +29,6 @@ async function saveRowEditing(row) {
       isActive: !!row._edit.isActive
     };
     await api.put(`/resources/${row.id}`, payload);
-    // aplica alterações locais
     row.name = payload.name;
     row.quantity = payload.quantity;
     row.isActive = payload.isActive;
@@ -39,14 +38,6 @@ async function saveRowEditing(row) {
   } catch (error) {
     toast.error('Erro ao atualizar recurso: ' + (error.response?.data?.message || error.message));
   }
-}
-
-function addEditingPropertie(items) {
-  const list = items?.value ?? items;
-  if (!list) return;
-  list.forEach(item => {
-    item.editing = false;
-  });
 }
 
 const resourceForm = reactive({
@@ -67,12 +58,10 @@ const fetchResources = async () => {
   try {
     const response = await api.get('/resources');
     resources.value = response.data;
-    addEditingPropertie(resources.value);
   } catch (error) {
     toast.error('Erro ao buscar recursos: ' + (error.response?.data?.message || error.message));
   }
 };
-
 
 const createResource = async () => {
   try {
@@ -153,10 +142,9 @@ onMounted(() => {
 
   <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md min-h-[60vh]">
     <div class="overflow-x-auto">
-      <!-- Colgroup com larguras relativas; table-layout: fixed controlará o comportamento responsivo -->
-      <table class="table responsive-table w-full">
+      <table class="table responsive-table w-full text-center">
         <thead>
-          <tr class="text-center">
+          <tr>
             <th class="py-2 px-3 font-semibold">Nome</th>
             <th class="py-2 px-3 font-semibold">Ativo</th>
             <th class="py-2 px-3 font-semibold">Quantidade</th>
@@ -164,8 +152,8 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="resource in resources" :key="resource.id" class="text-center text-gray-600">
-            <td class="py-2 px-3">
+          <tr v-for="resource in resources" :key="resource.id" class="text-gray-600">
+            <td>
               <div class="w-full" v-if="resource.editing">
                 <input v-model="resource._edit.name" class="input input-sm" />
               </div>
@@ -173,7 +161,7 @@ onMounted(() => {
                 <span class="w-full">{{ resource.name }}</span>
               </div>
             </td>
-            <td class="py-2 px-3">
+            <td>
               <div v-if="resource.editing">
                 <input type="checkbox" class="checkbox" v-model="resource._edit.isActive" />
               </div>
@@ -181,7 +169,7 @@ onMounted(() => {
                 {{ resource.isActive ? 'Sim' : 'Não' }}
               </div>
             </td>
-            <td class="py-2 px-3">
+            <td>
               <div v-if="resource.editing">
                 <input type="number" min="1" v-model.number="resource._edit.quantity" class="input input-sm w-24" />
               </div>
@@ -189,7 +177,7 @@ onMounted(() => {
                 <span class="w-24">{{ resource.quantity }}</span>
               </div>
             </td>
-            <td class="py-2 px-3">
+            <td>
               <div v-if="resource.editing" class="flex justify-center gap-2">
                 <button @click="saveRowEditing(resource)" class="btn btn-circle btn-text btn-sm" aria-label="Salvar">
                   <span class="icon-[tabler--check] size-5"></span>
@@ -203,7 +191,7 @@ onMounted(() => {
                   <span class="icon-[tabler--pencil] size-5"></span>
                 </button>
                 <button @click="deleteResource(resource.id)" class="btn btn-circle btn-text btn-sm" aria-label="Excluir recurso">
-                  <span class="icon-[tabler--trash] size-5" data-overlay="#createResourceModal"></span>
+                  <span class="icon-[tabler--trash] size-5"></span>
                 </button>
               </div>
             </td>
