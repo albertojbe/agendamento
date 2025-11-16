@@ -7,6 +7,47 @@ import 'vue-toast-notification/dist/theme-sugar.css';
 const toast = useToast();
 const resources = ref([]);
 
+function activeRowEditing(row) {
+  row.editing = true;
+  row._edit = {
+    name: row.name,
+    quantity: row.quantity,
+    isActive: row.isActive
+  };
+}
+
+function cancelRowEditing(row) {
+  row.editing = false;
+  delete row._edit;
+}
+
+async function saveRowEditing(row) {
+  try {
+    const payload = {
+      name: row._edit.name,
+      quantity: Number(row._edit.quantity),
+      isActive: !!row._edit.isActive
+    };
+    await api.put(`/resources/${row.id}`, payload);
+    // aplica alterações locais
+    row.name = payload.name;
+    row.quantity = payload.quantity;
+    row.isActive = payload.isActive;
+    row.editing = false;
+    delete row._edit;
+    toast.success('Recurso atualizado com sucesso!');
+  } catch (error) {
+    toast.error('Erro ao atualizar recurso: ' + (error.response?.data?.message || error.message));
+  }
+}
+
+function addEditingPropertie(items) {
+  const list = items?.value ?? items;
+  if (!list) return;
+  list.forEach(item => {
+    item.editing = false;
+  });
+}
 
 const resourceForm = reactive({
   id: null,
@@ -26,35 +67,19 @@ const fetchResources = async () => {
   try {
     const response = await api.get('/resources');
     resources.value = response.data;
+    addEditingPropertie(resources.value);
   } catch (error) {
     toast.error('Erro ao buscar recursos: ' + (error.response?.data?.message || error.message));
   }
 };
 
-const changeResourceForm = (resource) => {
-  resourceForm.id = resource.id;
-  resourceForm.name = resource.name;
-  resourceForm.quantity = resource.quantity;
-  resourceForm.isActive = resource.isActive;
-};
-
-const updateResource = async () => {
-  try {
-    await api.put(`/resources/${resourceForm.id}`, resourceForm);
-    await fetchResources();
-    resetForm();
-    toast.success('Recurso atualizado com sucesso!');
-  } catch (error) {
-    toast.error('Erro ao atualizar recurso: ' + (error.response?.data?.message || error.message));
-  }
-};
 
 const createResource = async () => {
   try {
     await api.post('/resources', resourceForm);
     await fetchResources();
     resetForm();
-    toast.success('Recurso criado com sucesso!');
+    toast.success('🆗 Recurso criado com sucesso!');
   } catch (error) {
     toast.error('Erro ao criar recurso: ' + (error.response?.data?.message || error.message));
   }
@@ -63,7 +88,7 @@ const createResource = async () => {
 const deleteResource = async (resourceId) => {
   try {
     await api.delete(`/resources/${resourceId}`);
-    fetchResources();
+    await fetchResources();
     toast.success('Recurso excluído com sucesso!');
   } catch (error) {
     toast.error('Erro ao excluir recurso: ' + (error.response?.data?.message || error.message));
@@ -73,7 +98,6 @@ const deleteResource = async (resourceId) => {
 onMounted(() => {
   fetchResources();
 });
-
 </script>
 
 <template>
@@ -82,42 +106,6 @@ onMounted(() => {
       Recursos
     </h1>
   </header>
-
-  <div id="updateResourceModal"
-    class="overlay modal overlay-open:opacity-100 overlay-open:duration-300"
-    role="dialog" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">Atualizar Recurso</h3>
-          <button type="button" class="btn btn-text btn-circle btn-sm absolute end-3 top-3" aria-label="Close"
-            data-overlay="#updateResourceModal">
-            <span class="icon-[tabler--x] size-4"></span>
-          </button>
-        </div>
-        <form>
-          <div class="modal-body pt-0">
-            <div class="mb-4">
-              <label class="label-text" for="updateName"> Nome </label>
-              <input type="text" placeholder="Projetor" class="input" id="updateName" v-model="resourceForm.name" autofocus />
-            </div>
-            <div class="mb-0.5">
-              <label class="label-text" for="updateQuantity"> Quantidade </label>
-              <input type="number" placeholder="1" class="input" id="updateQuantity" v-model="resourceForm.quantity" />
-            </div>
-            <div class="mb-0.5 mt-5 flex flex-row items-center gap-2">
-              <label class="label-text font-semibold" for="updateIsActive"> Ativo </label>
-              <input type="checkbox" class="checkbox" id="updateIsActive" v-model="resourceForm.isActive" />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-soft btn-secondary" data-overlay="#updateResourceModal">Fechar</button>
-            <button type="submit" @click.prevent="updateResource()" class="btn btn-primary" data-overlay="#updateResourceModal">Enviar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
   <div id="createResourceModal"
     class="overlay modal overlay-open:opacity-100 overlay-open:duration-300 hidden [--has-autofocus:false]"
@@ -135,7 +123,8 @@ onMounted(() => {
           <div class="modal-body pt-0">
             <div class="mb-4">
               <label class="label-text" for="modalFullName"> Nome </label>
-              <input type="text" placeholder="Projetor" class="input" id="modalFullName" v-model="resourceForm.name" autofocus />
+              <input type="text" placeholder="Projetor" class="input" id="modalFullName" v-model="resourceForm.name"
+                autofocus />
             </div>
             <div class="mb-0.5">
               <label class="label-text" for="modalEmail"> Quantidade </label>
@@ -148,7 +137,8 @@ onMounted(() => {
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-soft btn-secondary" data-overlay="#createResourceModal">Fechar</button>
-            <button type="submit" @click.prevent="createResource" class="btn btn-primary" data-overlay="#createResourceModal">Enviar</button>
+            <button type="submit" @click.prevent="createResource" class="btn btn-primary"
+              data-overlay="#createResourceModal">Enviar</button>
           </div>
         </form>
       </div>
@@ -161,31 +151,70 @@ onMounted(() => {
     </button>
   </div>
 
-  <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md min-h-[60vh]">
+  <div class="rounded-box shadow-base-300/10 bg-base w-full pb-2 shadow-md min-h-[60vh]">
     <div class="overflow-x-auto">
-      <table class="table">
+      <!-- Colgroup com larguras relativas; table-layout: fixed controlará o comportamento responsivo -->
+      <table class="table responsive-table w-full">
         <thead>
           <tr>
-            <th>Nome</th>
-            <th>Ativo</th>
-            <th>Quantidade</th>
-            <th>Ações</th>
+            <th class="py-2 px-3 text-center">Nome</th>
+            <th class="py-2 px-3 text-center">Ativo</th>
+            <th class="py-2 px-3 text-center">Quantidade</th>
+            <th class="py-2 px-3 text-center">Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="resource in resources" :key="resource.id">
-            <td>{{ resource.name }}</td>
-            <td>{{ resource.isActive ? 'Sim' : 'Não' }}</td>
-            <td>{{ resource.quantity }}</td>
-            <td>
-              <button @click="changeResourceForm(resource)" class="btn btn-circle btn-text btn-sm" aria-label="Editar evento" data-overlay="#updateResourceModal"><span
-                  class="icon-[tabler--pencil] size-5"></span></button>
-              <button @click="deleteResource(resource.id)" class="btn btn-circle btn-text btn-sm" aria-label="Excluir evento"><span
-                  class="icon-[tabler--trash] size-5"></span></button>
+          <tr v-for="resource in resources" :key="resource.id" class="text-center">
+            <td class="py-2 px-3">
+              <div class="w-full" v-if="resource.editing">
+                <input v-model="resource._edit.name" class="input input-sm" />
+              </div>
+              <div v-else class="truncate" :title="resource.name">
+                <span class="w-full">{{ resource.name }}</span>
+              </div>
+            </td>
+            <td class="py-2 px-3">
+              <div v-if="resource.editing">
+                <input type="checkbox" class="checkbox" v-model="resource._edit.isActive" />
+              </div>
+              <div v-else>
+                {{ resource.isActive ? 'Sim' : 'Não' }}
+              </div>
+            </td>
+            <td class="py-2 px-3">
+              <div v-if="resource.editing">
+                <input type="number" min="1" v-model.number="resource._edit.quantity" class="input input-sm w-24" />
+              </div>
+              <div v-else>
+                <span class="w-24">{{ resource.quantity }}</span>
+              </div>
+            </td>
+            <td class="py-2 px-3">
+              <div v-if="resource.editing" class="flex justify-center gap-2">
+                <button @click="saveRowEditing(resource)" class="btn btn-circle btn-text btn-sm" aria-label="Salvar">
+                  <span class="icon-[tabler--check] size-5"></span>
+                </button>
+                <button @click="cancelRowEditing(resource)" class="btn btn-circle btn-text btn-sm" aria-label="Cancelar">
+                  <span class="icon-[tabler--x] size-5"></span>
+                </button>
+              </div>
+              <div v-else class="flex justify-center gap-2">
+                <button @click="activeRowEditing(resource)" class="btn btn-circle btn-text btn-sm" aria-label="Editar recurso">
+                  <span class="icon-[tabler--pencil] size-5"></span>
+                </button>
+                <button @click="deleteResource(resource.id)" class="btn btn-circle btn-text btn-sm" aria-label="Excluir recurso">
+                  <span class="icon-[tabler--trash] size-5"></span>
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
+
     </div>
   </div>
 </template>
+
+<style scoped>
+
+</style>
