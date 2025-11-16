@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import api from '../config/api';
+import axios from 'axios';
+import { useToast } from 'vue-toast-notification';
+
+const toast = useToast();
 
 const rooms = ref([]);
 
@@ -12,10 +16,12 @@ const roomForm = ref({
 
 const fetchRooms = async () => {
   try {
+    console.log('Token', localStorage.getItem('authToken'));
     const response = await api.get('/rooms');
     rooms.value = response.data;
+    console.log('Fetched rooms:', rooms.value);
   } catch (error) {
-    console.error('Error fetching rooms:', error);
+    toast.error(error.response?.data?.message || 'Erro ao buscar salas');
   }
 };
 
@@ -34,15 +40,16 @@ const createRoom = async () => {
     const response = await api.post('/rooms', payload);
     rooms.value.push(response.data);
 
-    roomForm.value.name = '';
-    roomForm.value.location = '';
-    roomForm.value.capacity = null;
+    roomForm.value = {
+      id: null,
+      name: '',
+      location: '',
+      capacity: null
+    }
 
-    const overlay = document.querySelector('#room-modal');
-    if (overlay) overlay.classList.remove('overlay-open');
+    toast.success('Sala criada com sucesso!');
   } catch (error) {
-    console.error('Error creating room:', error);
-    alert(error.response?.data?.message || 'Erro ao criar sala');
+    toast.error(error.response?.data?.message || 'Erro ao criar sala');
   }
 };
 
@@ -50,8 +57,9 @@ const deleteRoom = async (roomId) => {
   try {
     await api.delete(`/rooms/${roomId}`);
     rooms.value = rooms.value.filter(room => room.id !== roomId);
+    toast.success('Sala excluída com sucesso!');
   } catch (error) {
-    console.error('Error deleting room:', error);
+    toast.error(error.response?.data?.message || 'Erro ao excluir sala');
   }
 };
 
