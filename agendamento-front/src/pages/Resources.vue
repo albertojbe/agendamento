@@ -142,7 +142,7 @@ onMounted(() => {
 
   <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md min-h-[60vh]">
     <div class="overflow-x-auto">
-      <table class="table responsive-table w-full text-center">
+      <table class="table table-fixed responsive-table w-full text-center">
         <thead>
           <tr>
             <th class="py-2 px-3 font-semibold">Nome</th>
@@ -154,11 +154,11 @@ onMounted(() => {
         <tbody>
           <tr v-for="resource in resources" :key="resource.id" class="text-gray-600">
             <td>
-              <div class="w-full" v-if="resource.editing">
+              <div v-if="resource.editing">
                 <input v-model="resource._edit.name" class="input input-sm" />
               </div>
               <div v-else class="truncate" :title="resource.name">
-                <span class="w-full">{{ resource.name }}</span>
+                <span>{{ resource.name }}</span>
               </div>
             </td>
             <td>
