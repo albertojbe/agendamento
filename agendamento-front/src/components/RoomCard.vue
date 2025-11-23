@@ -8,12 +8,19 @@ const props = defineProps({
   }
 });
 
+function handleRoomImage(imagePath) {
+    if (imagePath) {
+        return `${BASE_URL}${imagePath.substring(7)}`
+    }
+    return 'https://placehold.co/300x200?text=Sem+Imagem'
+}
+
 </script>
 
 <template>
     <div class="card group hover:shadow-sm sm:max-w-sm">
         <figure class="bg-gray-50">
-            <img :src="`${BASE_URL}${room.imagePath.substring(7)}`" alt="Sala"
+            <img :src="handleRoomImage(room.imagePath)" alt="Sala"
                 class="transition-transform duration-500 group-hover:scale-110 object-cover h-40 w-full" />
         </figure>
 
