@@ -39,7 +39,7 @@ const createRoom = async () => {
     payload.append("name", roomForm.value.name);
     payload.append("location", roomForm.value.location);
     payload.append("capacity", roomForm.value.capacity);
-    payload.append("details", roomForm.value.details ?? "");
+    payload.append("detail", roomForm.value.detail ?? "");
     if (roomForm.value.roomImage) {
       payload.append("roomImage", roomForm.value.roomImage);
     }
@@ -55,7 +55,7 @@ const createRoom = async () => {
       name: '',
       location: '',
       capacity: null,
-      details: '',
+      detail: '',
       roomImage: null
     };
 
@@ -123,7 +123,7 @@ onMounted(() => {
             </div>
             <div>
               <label class="label-text" for="roomDetails">Detalhes (Opcional)</label>
-              <textarea id="roomDetails" v-model="roomForm.details" placeholder="Detalhes da sala" class="input" />
+              <textarea id="roomDetails" v-model="roomForm.detail" placeholder="Detalhes da sala" class="input" />
             </div>
             <div>
               <label class="label-text" for="roomPhoto">Foto da sala</label>
