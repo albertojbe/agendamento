@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import api from '../config/api';
+import { api } from '../config/api';
+import CalendarComponent from '../components/CalendarComponent.vue';
 
 const events = ref([]);
 const rooms = ref([]);
@@ -79,7 +80,7 @@ onMounted(() => {
 </script>
 
 <template>
-  
+
   <div class="container mx-auto flex flex-row items-center justify-between mb-4">
     <div>
       <h1 class="text-2xl font-semibold">Agendamentos</h1>
@@ -134,32 +135,6 @@ onMounted(() => {
   </div>
 
   <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md min-h-[60vh]">
-    <div class="overflow-x-auto">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Sala</th>
-            <th>Ínicio</th>
-            <th>Fim</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="event in events" :key="event.id">
-            <td>{{ event.title }}</td>
-            <td>{{rooms.find(r => r.id === event.roomId)?.name || event.roomId}}</td>
-            <td>{{ event.start }}</td>
-            <td>{{ event.end }}</td>
-            <td>
-              <button class="btn btn-circle btn-text btn-sm" aria-label="Editar evento"><span
-                  class="icon-[tabler--pencil] size-5"></span></button>
-              <button @click="deleteEvent(event.id)" class="btn btn-circle btn-text btn-sm"
-                aria-label="Excluir evento"><span class="icon-[tabler--trash] size-5"></span></button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <CalendarComponent :events="events" @delete-event="deleteEvent" />
   </div>
 </template>

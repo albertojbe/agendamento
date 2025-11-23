@@ -1,6 +1,6 @@
 <script setup>
 import { reactive } from 'vue';
-import api from '../config/api';
+import { api } from '../config/api';
 
 const userData = {
     name: '',

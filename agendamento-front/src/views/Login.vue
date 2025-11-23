@@ -1,5 +1,5 @@
 <script setup>
-import api from '../config/api';
+import { api } from '../config/api';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
