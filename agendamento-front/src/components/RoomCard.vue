@@ -40,7 +40,7 @@ function handleRoomImage(imagePath) {
             </p>
 
             <div class="card-actions flex gap-2 mt-2">
-                <button data-overlay="#room-modal" class="btn btn-primary flex-1">Editar</button>
+                <button @click="$emit('activateEditingRoom', room)" data-overlay="#room-modal" class="btn btn-primary flex-1">Editar</button>
                 <button @click="$emit('deleteRoom', room.id)" class="btn btn-error btn-soft flex-1">Excluir</button>
             </div>
         </div>

@@ -7,6 +7,7 @@ import RoomCard from '../components/RoomCard.vue';
 const toast = useToast();
 
 const rooms = ref([]);
+const isEditing = ref(false);
 
 function handleImgUpload(event) {
   roomForm.value.roomImage = event.target.files[0];
@@ -27,6 +28,30 @@ const fetchRooms = async () => {
   } catch (error) {
     toast.error(error.response?.data?.message || 'Erro ao buscar salas');
   }
+};
+
+const activateEditingRoom = (room) => {
+  isEditing.value = true;
+  roomForm.value = {
+    id: room.id,
+    name: room.name,
+    location: room.location,
+    capacity: room.capacity,
+    detail: room.detail,
+    roomImage: null
+  };
+};
+
+const resetForm = () => {
+  isEditing.value = false;
+  roomForm.value = {
+    id: null,
+    name: '',
+    location: '',
+    capacity: null,
+    detail: '',
+    roomImage: null
+  };
 };
 
 const createRoom = async () => {
@@ -50,20 +75,42 @@ const createRoom = async () => {
       }
     });
 
-    roomForm.value = {
-      id: null,
-      name: '',
-      location: '',
-      capacity: null,
-      detail: '',
-      roomImage: null
-    };
-
+    resetForm();
     fetchRooms();
     toast.success('Sala criada com sucesso!');
   } catch (error) {
     console.log(error)
     toast.error(error.response?.data?.message || 'Erro ao criar sala');
+  }
+};
+
+const updateRoom = async () => {
+  try {
+    if (!roomForm.value.name || !roomForm.value.capacity) {
+      return alert('Nome e capacidade são obrigatórios.');
+    }
+
+    const payload = new FormData();
+    payload.append("name", roomForm.value.name);
+    payload.append("location", roomForm.value.location);
+    payload.append("capacity", roomForm.value.capacity);
+    payload.append("detail", roomForm.value.detail ?? "");
+    if (roomForm.value.roomImage) {
+      payload.append("roomImage", roomForm.value.roomImage);
+    }
+
+    const response = await api.put(`/rooms/${roomForm.value.id}`, payload, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
+
+    resetForm();
+    fetchRooms();
+    toast.success('Sala atualizada com sucesso!');
+  } catch (error) {
+    console.log(error)
+    toast.error(error.response?.data?.message || 'Erro ao atualizar sala');
   }
 };
 
@@ -99,7 +146,7 @@ onMounted(() => {
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="modal-title">Adicionar Sala</h3>
+          <h3 class="modal-title">{{ isEditing ? 'Editar Sala' : 'Adicionar Sala' }}</h3>
           <button type="button" class="btn btn-text btn-circle btn-sm absolute end-3 top-3" aria-label="Close"
             data-overlay="#room-modal">
             <span class="icon-[tabler--x] size-4"></span>
@@ -133,7 +180,8 @@ onMounted(() => {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-soft btn-secondary" data-overlay="#room-modal">Fechar</button>
-          <button type="button" @click="createRoom" class="btn btn-primary" data-overlay="#room-modal">Salvar</button>
+          <button v-if="isEditing" type="button" @click="updateRoom" class="btn btn-primary" data-overlay="#room-modal">Salvar</button>
+          <button v-else type="button" @click="createRoom" class="btn btn-primary" data-overlay="#room-modal">Criar</button>
         </div>
       </div>
     </div>
@@ -141,7 +189,7 @@ onMounted(() => {
 
   <div class="overflow-x-auto p-6">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <RoomCard v-for="room in rooms" :key="room.id" :room="room" @deleteRoom="deleteRoom" />
+      <RoomCard v-for="room in rooms" :key="room.id" :room="room" @activateEditingRoom="activateEditingRoom" @deleteRoom="deleteRoom" />
     </div>
   </div>
 </template>

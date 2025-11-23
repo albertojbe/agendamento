@@ -52,10 +52,13 @@ router.post('/', upload.single('roomImage'), async (req, res) => {
     }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', upload.single('roomImage'), (req, res) => {
     try {
         const roomId = req.params.id;
         const roomDTO = roomServicee.createRoomDTO(req.body);
+        if (req.file) {
+            roomDTO.imagePath = req.file.path;
+        }
         roomServicee.updateRoom(roomId, roomDTO)
             .then(updatedRoom => {
                 if (updatedRoom) {
