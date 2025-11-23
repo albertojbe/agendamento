@@ -16,6 +16,14 @@ Room.init({
         type: DataTypes.STRING,
         allowNull: true,
     },
+    detail: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },  
+    imagePath: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    }
 },
     {
         sequelize: db,

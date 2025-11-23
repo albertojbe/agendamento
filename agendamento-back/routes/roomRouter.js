@@ -1,9 +1,11 @@
 const express = require('express');
 const { validateJWT } = require('../middlewares/authMiddleware');
+const multer = require('multer');
 
 const roomServicee = require('../services/roomService');
 
 const router = express.Router();
+const upload = multer({ dest: './public/images/roomImages/' })
 
 router.use(validateJWT);
 
@@ -34,9 +36,10 @@ router.get('/:id', (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', upload.single('roomImage'), async (req, res) => {
     try {
         const roomDTO = roomServicee.createRoomDTO(req.body);
+        roomDTO.imagePath = req.file ? req.file.path : null;
         const newRoom = await roomServicee.createRoom(roomDTO);
         res.status(201).json(newRoom);
     } catch (error) {

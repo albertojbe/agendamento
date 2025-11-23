@@ -48,9 +48,13 @@ exports.findRoomById = async function(id) {
 }
 
 exports.createRoomDTO = function(roomData) {
-    return {
+    let roomDTO = {
         name: roomData.name,
         capacity: roomData.capacity,
         location: roomData.location
     }
+    if (roomData.detail !== undefined) {
+        roomDTO.detail = roomData.detail;
+    }
+    return roomDTO;
 }
