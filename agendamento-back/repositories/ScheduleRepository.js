@@ -1,4 +1,4 @@
-const Schedule = require('../models/scheduleModel');
+const { Schedule } = require('../models');
 
 class ScheduleRepository {
     async findAll() {
@@ -23,6 +23,19 @@ class ScheduleRepository {
 
     async delete(id) {
         return await Schedule.destroy({ where: { id } });
+    }
+
+    async findConflict({ roomId, resourceId, start, end }) {
+        return await Schedule.findOne({
+            where: {
+                [Op.or]: [
+                    { roomId },
+                    { resourceId }
+                ],
+                start: { [Op.lt]: end },
+                end: { [Op.gt]: start }
+            }
+        });
     }
 }
 
