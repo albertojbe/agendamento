@@ -1,4 +1,5 @@
 const { Schedule } = require('../models');
+const { Op } = require('sequelize');
 
 class ScheduleRepository {
     async findAll() {
