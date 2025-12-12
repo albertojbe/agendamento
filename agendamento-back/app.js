@@ -1,3 +1,4 @@
+// process.env.TZ = 'America/Maceio';
 require('dotenv').config();
 
 var express = require('express');
@@ -6,11 +7,14 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors')
 
+// console.log(new Date().toString());
+
+
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/userRouter');
 var authRouter = require('./routes/authRouter');
 var roomRouter = require('./routes/roomRouter');
-var eventRouter = require('./routes/eventRouter');
+var scheduleRouter = require('./routes/scheduleRouter');
 var resourceRouter = require('./routes/resourceRouter');
 
 (() => {
@@ -34,7 +38,7 @@ app.use('/status', indexRouter);
 app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/rooms', roomRouter);
-app.use('/events', eventRouter);
+app.use('/schedules', scheduleRouter);
 app.use('/resources', resourceRouter);
 
 module.exports = app;

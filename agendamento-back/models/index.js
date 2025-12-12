@@ -2,53 +2,40 @@ const db = require('../config/db');
 const { DataTypes } = require('sequelize');
 
 const Room = require('./roomModel');
-const Event = require('./eventModel');
+const Schedule = require('./scheduleModel');
 const User = require('./userModel');
 const Resource = require('./resourceModel');
 
-Room.hasMany(Resource, {
+Room.hasMany(Schedule, {
     foreignKey: 'roomId',
-    as: 'resources',
-});
-
-Resource.belongsTo(Room, {
-    foreignKey: 'roomId',
-    as: 'room',
-    onDelete: 'CASCADE',
-});
-
-Room.hasMany(require('./eventModel'), {
-    foreignKey: 'roomId',
-    as: 'events',
+    as: 'schedules',
 })
 
-User.hasMany(require('./eventModel'), {
-    foreignKey: 'userId',
-    as: 'events',
+Resource.hasMany(Schedule, {
+    as: 'schedules',   
+    foreignKey: 'resourceId',
 });
 
-Event.belongsTo(require('./roomModel'), {
+User.hasMany(Schedule, {
+    foreignKey: 'userId',
+    as: 'schedules',
+});
+
+Schedule.belongsTo(Room, {
     foreignKey: 'roomId',
     as: 'room',
     onDelete: 'CASCADE',
 });
 
-Event.belongsTo(require('./userModel'), {
+Schedule.belongsTo(User, {
     foreignKey: 'userId',
     as: 'user',
     onDelete: 'CASCADE',
 });
 
-Event.belongsToMany(Resource, {
-    through: 'EventResources',
-    as: 'resources',
-    foreignKey: 'eventId',
-});
-
-Resource.belongsToMany(Event, {
-    through: 'EventResources',
-    as: 'events',
+Schedule.belongsTo(Resource, {
+    as: 'resource',
     foreignKey: 'resourceId',
 });
 
-module.exports = { db, Room, Event, User };
+module.exports = { db, Room, Schedule, User, Resource };
