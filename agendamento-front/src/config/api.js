@@ -1,10 +1,15 @@
 import axios from "axios";
 
-export const BASE_URL = 'http://localhost:3000/'
+const BASE_URL = 'http://localhost:3000/'
 
-export const api = axios.create({
+const api = axios.create({
     baseURL: BASE_URL,
     headers: {
         Authorization: `Bearer ${localStorage.getItem('authToken')}`
-    }
+    },
+    withCredentials: true
 });
+
+api.defaults.withCredentials = true;
+
+export { api, BASE_URL};

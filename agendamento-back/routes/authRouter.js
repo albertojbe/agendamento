@@ -11,7 +11,14 @@ router.post('/token', async (req, res, next) => {
     try {
         const authDTO = { email: req.body.email, password: req.body.password };
         const token = await authServiceInstance.authenticate(authDTO);
-        res.status(200).json({ token });
+        res
+            .cookie('authToken', token, {
+                httpOnly: true,
+                secure: true,
+                domain: 'localhost'
+            })
+            .status(200)
+            .json({ token });
     } catch (error) {
         next(error);
     }
@@ -19,8 +26,10 @@ router.post('/token', async (req, res, next) => {
 
 router.post('/validate', async (req, res, next) => {
     try {
-        const payload = authServiceInstance.verifyToken(req.body.token);
-        res.json({ user: payload });
+        const payload = authServiceInstance.verifyToken(req.cookies.authToken);
+        res
+            .status(200)
+            .json({ user: payload });
     } catch (error) {
         next(error);
     }

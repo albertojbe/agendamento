@@ -4,8 +4,7 @@ const userRepository = require('../repositories/UserRepository');
 const authServiceInstance = new AuthService(userRepository);
 
 exports.validateJWT = function (req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const token = req.cookies.authToken;
 
   if (!token) {
     return res.status(401).json({ message: 'Token não fornecido' });
