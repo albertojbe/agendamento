@@ -3,17 +3,26 @@ const router = express.Router();
 
 const ScheduleService = require('../services/ScheduleService');
 const scheduleRepository = require('../repositories/ScheduleRepository');
-const roomService = require('../services/RoomService');
-const resourceService = require('../services/ResourceService');
-const userService = require('../services/UserService');
+const RoomService = require('../services/RoomService');
+const ResourceService = require('../services/ResourceService');
+const UserService = require('../services/UserService');
+const roomRepository = require('../repositories/RoomRepository');
+const resourceRepository = require('../repositories/ResourceRepository');
+const userRepository = require('../repositories/UserRepository');
 const { validateJWT } = require('../middlewares/authMiddleware');
 const errorMiddleware = require('../middlewares/errorMiddleware');
 
+// Instanciar os serviços
+const roomServiceInstance = new RoomService(roomRepository);
+const resourceServiceInstance = new ResourceService(resourceRepository);
+const userServiceInstance = new UserService(userRepository);
+
+// Instanciar o ScheduleService com as instâncias dos serviços
 const scheduleServiceInstance = new ScheduleService(
     scheduleRepository,
-    roomService,
-    resourceService,
-    userService
+    roomServiceInstance,
+    resourceServiceInstance,
+    userServiceInstance
 );
 
 const createScheduleDTO = (body, userId) => {

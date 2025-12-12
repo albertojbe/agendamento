@@ -28,21 +28,40 @@ class ScheduleService {
             throw new errors.ValidationError("Não é permitido selecionar sala e recurso ao mesmo tempo.");
         }
 
-        const room = await this.roomService.findByRoomId(dto.roomId);
-        const resource = await this.resourceService.findByResourceId(dto.resourceId);
-        if (!room) throw new errors.NotFoundError("Sala não encontrada.");
-        if (!resource) throw new errors.NotFoundError("Recurso não encontrado.");
-        if (dto.participantsQuantity > room.capacity) throw new errors.ValidationError("Número de participantes excede a capacidade da sala.");
+        const room = dto.roomId ? await this.roomService.findRoomById(dto.roomId) : null;
+        const resource = dto.resourceId ? await this.resourceService.findResourceById(dto.resourceId) : null;
+        
+        if (dto.roomId && !room) {
+            throw new errors.NotFoundError("Sala não encontrada.");
+        }
+        if (dto.resourceId && !resource) {
+            throw new errors.NotFoundError("Recurso não encontrado.");
+        }
+        if (room && dto.participantsQuantity > room.capacity) {
+            throw new errors.ValidationError("Número de participantes excede a capacidade da sala.");
+        }
 
-        const conflict = await this.scheduleRepository.findConflict({ roomId: dto.roomId, resourceId: dto.resourceId, start: dto.start, end: dto.end });
-        if (conflict) throw new errors.ValidationError("Já existe um agendamento no horário selecionado.");
+        const conflict = await this.scheduleRepository.findConflict({ 
+            roomId: dto.roomId, 
+            resourceId: dto.resourceId, 
+            start: dto.start, 
+            end: dto.end 
+        });
+        if (conflict) {
+            throw new errors.ValidationError("Já existe um agendamento no horário selecionado.");
+        }
 
         const newSchedule = await this.scheduleRepository.create(dto);
         return newSchedule.toJSON();
     }
 
     async updateSchedule(id, dto) {
-        const conflict = await this.scheduleRepository.findConflict({ roomId: dto.roomId, resourceId: dto.resourceId, start: dto.start, end: dto.end });
+        const conflict = await this.scheduleRepository.findConflict({ 
+            roomId: dto.roomId, 
+            resourceId: dto.resourceId, 
+            start: dto.start, 
+            end: dto.end 
+        });
         if (conflict && conflict.id !== id) {
             throw new errors.ValidationError("Já existe um agendamento no horário selecionado.");
         }
@@ -56,7 +75,7 @@ class ScheduleService {
     }
 
     async deleteSchedule(id) {
-        const deleted = await this.scheduleRepository.deleteSchedule(id);
+        const deleted = await this.scheduleRepository.delete(id);
         if (!deleted) {
             throw new errors.NotFoundError('Agendamento não encontrado');
         }
