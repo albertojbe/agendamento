@@ -37,6 +37,18 @@ class ScheduleRepository {
             }
         });
     }
+
+    async findByRoomId(roomId) {
+        return await Schedule.findAll({ where: { roomId } });
+    }
+
+    async findByResourceId(resourceId) {
+        return await Schedule.findAll({ where: { resourceId } });
+    }
+
+    async findByUserId(userId) {
+        return await Schedule.findAll({ where: { userId } });
+    }
 }
 
 module.exports = new ScheduleRepository();
