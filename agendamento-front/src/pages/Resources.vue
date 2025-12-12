@@ -140,7 +140,7 @@ onMounted(() => {
     </div>
   </header>
 
-  <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md min-h-[60vh]">
+  <div class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md max-h-[80vh] overflow-auto">
     <div class="overflow-x-auto">
       <table class="table table-fixed responsive-table w-full text-center">
         <thead>
