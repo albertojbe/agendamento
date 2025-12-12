@@ -1,34 +1,31 @@
-const authService = require('../services/authService');
-
 const express = require('express');
 const router = express.Router();
 
+const AuthService = require('../services/AuthService');
+const userRepository = require('../repositories/UserRepository');
+const errorMiddleware = require('../middlewares/errorMiddleware');
 
-// Get Token
-router.post('/token', function(req, res, next) {
-  try {
-    authService.generateToken(authService.authDTO(req.body)).then(token => {
-      res.status(200).json({ token: token });
-    }).catch(error => {
-      res.status(401).json({ message: error.message });
-    });
-    
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-}
-);
+const authServiceInstance = new AuthService(userRepository);
 
-// Validate token and get user info
-router.post('/validate', function(req, res) {
-  try {
-    const payload = authService.verifyToken(req.body.token);
-    res.json({user: payload});
-  } catch (error) {
-    res.status(401).json({ message: error.message });
-  }
+router.post('/token', async (req, res, next) => {
+    try {
+        const authDTO = { email: req.body.email, password: req.body.password };
+        const token = await authServiceInstance.authenticate(authDTO);
+        res.status(200).json({ token });
+    } catch (error) {
+        next(error);
+    }
 });
 
+router.post('/validate', async (req, res, next) => {
+    try {
+        const payload = authServiceInstance.verifyToken(req.body.token);
+        res.json({ user: payload });
+    } catch (error) {
+        next(error);
+    }
+});
 
+router.use(errorMiddleware);
 
 module.exports = router;

@@ -1,65 +1,67 @@
 const express = require('express');
 const router = express.Router();
-const resourceService = require('../services/resourceService');
 
-// Get all resources
-router.get('/', async (req, res) => {
+const errorMiddleware = require('../middlewares/errorMiddleware');
+const ResourceService = require('../services/ResourceService');
+const resourceRepository = require('../repositories/ResourceRepository');
+
+const resourceServiceInstance = new ResourceService(resourceRepository);
+
+const createResourceDTO = (resourceData) => {
+    return {
+        name: resourceData.name,
+        quantity: resourceData.quantity,
+        isActive: resourceData.isActive
+    };
+}
+
+router.get('/', async (req, res, next) => {
     try {
-        const resources = await resourceService.getAllResources();
+        const resources = await resourceServiceInstance.getAllResources();
         res.json(resources);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch resources' });
+        next(error);
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
     try {
-        const resource = await resourceService.findResourceById(req.params.id);
-        if (resource) {
-            res.json(resource);
-        } else {
-            res.status(404).json({ message: 'Resource not found' });
-        }
+        const resource = await resourceServiceInstance.findResourceById(req.params.id);
+        res.json(resource);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch resource' });
+        next(error);
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
     try {
-        const resourceDTO = resourceService.createResourceDTO(req.body);
-        const newResource = await resourceService.createResource(resourceDTO);
+        const resourceDTO = createResourceDTO(req.body);
+        const newResource = await resourceServiceInstance.createResource(resourceDTO);
         res.status(201).json(newResource);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to create resource' });
+        next(error);
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
     try {
-        const resourceDTO = resourceService.createResourceDTO(req.body);
-        const updatedResource = await resourceService.updateResource(req.params.id, resourceDTO);
-        if (updatedResource) {
-            res.json(updatedResource);
-        } else {
-            res.status(404).json({ message: 'Resource not found' });
-        }
+        const resourceDTO = createResourceDTO(req.body);
+        const updatedResource = await resourceServiceInstance.updateResource(req.params.id, resourceDTO);
+        res.json(updatedResource);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to update resource' });
+        next(error);
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
     try {
-        const deleted = await resourceService.deleteResource(req.params.id);
-        if (deleted) {
-            res.json({ message: 'Resource deleted successfully' });
-        } else {
-            res.status(404).json({ message: 'Resource not found' });
-        }
+        await resourceServiceInstance.deleteResource(req.params.id);
+        res.json({ message: 'Recurso excluído com sucesso.' });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to delete resource' });
+        next(error);
     }
 });
+
+router.use(errorMiddleware);
 
 module.exports = router;

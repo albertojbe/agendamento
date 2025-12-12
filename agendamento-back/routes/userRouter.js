@@ -1,77 +1,58 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-const userService = require('../services/userService');
+const UserService = require('../services/UserService');
+const userRepository = require('../repositories/UserRepository');
+const errorMiddleware = require('../middlewares/errorMiddleware');
 
-// Find User by ID
-router.get('/:id', function (req, res, next) {
+const userServiceInstance = new UserService(userRepository);
+
+router.get('/:id', async (req, res, next) => {
   try {
-    const userId = req.params.id;
-    userService.findUserById(userId)
-      .then(user => {
-        if (user !== null) {
-          res.json(user);
-        } else {
-          res.status(404).json({ message: 'User not found' });
-        }
-      })
+    const user = await userServiceInstance.findUserById(req.params.id);
+    res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
-
-// Register User
-router.post('/', async function (req, res, next) {
+router.post('/', async (req, res, next) => {
   try {
-    const userDTO = userService.createUserDTO(req.body);
-    const newUser = await userService.createUser(userDTO);
+    const userDTO = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password
+    };
+    const newUser = await userServiceInstance.createUser(userDTO);
     res.status(201).json(newUser);
-
   } catch (error) {
-    if (error.status === 409) {
-      res.status(409).json({ message: error.message });
-    } else {
-      console.error(error);
-      res.status(500).json({ message: 'Erro ao criar usuário' });
-    }
+    next(error);
   }
 });
 
-
-// Update User
-router.put('/:id', function (req, res, next) {
+router.put('/:id', async (req, res, next) => {
   try {
-    const userId = req.params.id;
-    const userDTO = userService.createUserDTO(req.body);
-    userService.updateUser(userId, userDTO)
-      .then(updatedUser => {
-        if (updatedUser) {
-          res.json(updatedUser);
-        } else {
-          res.status(404).json({ message: 'User not found' });
-        }
-      })
+    const userDTO = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password
+    };
+    const updatedUser = await userServiceInstance.updateUser(req.params.id, userDTO);
+    res.json(updatedUser);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
-// Delete User
-router.delete('/:id', function (req, res, next) {
+router.delete('/:id', async (req, res, next) => {
   try {
-    const userId = req.params.id;
-    userService.deleteUser(userId)
-      .then(deleted => {
-        if (deleted) {
-          res.json({ message: 'User deleted successfully' });
-        } else {
-          res.status(404).json({ message: 'User not found' });
-        }
-      })
+    await userServiceInstance.deleteUser(req.params.id);
+    res.json({ message: 'Usuário excluído com sucesso' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
+
+router.use(errorMiddleware);
 
 module.exports = router;

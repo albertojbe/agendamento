@@ -1,113 +1,110 @@
-const scheduleService = require('../services/scheduleService');
-const { validateJWT } = require('../middlewares/authMiddleware');
-
 const express = require('express');
 const router = express.Router();
 
+const ScheduleService = require('../services/ScheduleService');
+const scheduleRepository = require('../repositories/ScheduleRepository');
+const roomService = require('../services/RoomService');
+const resourceService = require('../services/ResourceService');
+const userService = require('../services/UserService');
+const { validateJWT } = require('../middlewares/authMiddleware');
+const errorMiddleware = require('../middlewares/errorMiddleware');
+
+const scheduleServiceInstance = new ScheduleService(
+    scheduleRepository,
+    roomService,
+    resourceService,
+    userService
+);
+
+const createScheduleDTO = (body, userId) => {
+    return {
+        userId: userId,
+        roomId: body.roomId,
+        resourceId: body.resourceId,
+        title: body.title,
+        description: body.description,
+        start: body.start,
+        end: body.end,
+        participantsQuantity: body.participantsQuantity
+    };
+};
+
 router.use(validateJWT);
 
-router.post('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
-        const userId = req.user.id;
-        const scheduleDTO = scheduleService.createScheduleDTO(userId, req.body);
-        const newSchedule = await scheduleService.createSchedule(scheduleDTO);
+        const schedules = await scheduleServiceInstance.getAllSchedules();
+        res.json(schedules);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/:id', async (req, res, next) => {
+    try {
+        const schedule = await scheduleServiceInstance.findScheduleById(req.params.id);
+        res.json(schedule);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/room/:roomId', async (req, res, next) => {
+    try {
+        const schedules = await scheduleServiceInstance.findByRoomId(req.params.roomId);
+        res.json(schedules);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/resource/:resourceId', async (req, res, next) => {
+    try {
+        const schedules = await scheduleServiceInstance.findByResourceId(req.params.resourceId);
+        res.json(schedules);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/user/:userId', async (req, res, next) => {
+    try {
+        const schedules = await scheduleServiceInstance.findByUserId(req.params.userId);
+        res.json(schedules);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/', async (req, res, next) => {
+    try {
+        const scheduleDTO = createScheduleDTO(req.body, req.user.id);
+        const newSchedule = await scheduleServiceInstance.createSchedule(scheduleDTO);
         res.status(201).json(newSchedule);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
     try {
-        const scheduleId = req.params.id;
-        const userId = req.user.id;
-        const scheduleDTO = scheduleService.createScheduleDTO(userId, req.body);
-        const updatedSchedule = await scheduleService.updateSchedule(scheduleId, scheduleDTO);
-        if (updatedSchedule) {
-            res.json(updatedSchedule);
-        } else {
-            res.status(404).json({ message: 'Agendamento não encontrado' });
-        }
+        const scheduleDTO = createScheduleDTO(req.body, req.user.id);
+        const updatedSchedule = await scheduleServiceInstance.updateSchedule(req.params.id, scheduleDTO);
+        res.json(updatedSchedule);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
     try {
-        const deleted = await scheduleService.deleteSchedule(req.params.id);
-        if (deleted) {
-            res.json({ message: 'Agendamento deletado com sucesso' });
-        } else {
-            res.status(404).json({ message: 'Agendamento não encontrado' });
-        }
+        await scheduleServiceInstance.deleteSchedule(req.params.id);
+        res.json({ message: 'Agendamento deletado com sucesso' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro ao deletar agendamento' });
+        next(error);
     }
 });
 
-router.get('/', async (req, res) => {
-    try {
-        const schedules = await scheduleService.getAllSchedules();
-        console.log('Returning schedules: ', schedules);
-        res.json(schedules);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
-    }
-});
-
-router.get('/:id', async (req, res) => {
-    try {
-        const eventId = req.params.id;
-        const schedule = await scheduleService.findScheduleById(eventId);
-        if (schedule) {
-            res.json(schedule);
-        } else {
-            res.status(404).json({ message: 'Agendamento não encontrado' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
-    }
-});
-
-router.get('/room/:roomId', async (req, res) => {
-    try {
-        const roomId = req.params.roomId;
-        const schedules = await scheduleService.findByRoomId(roomId);
-        res.json(schedules);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro ao buscar agendamentos' });
-    }
-});
-
-router.get('/resource/:resourceId', async (req, res) => {
-    try {
-        const resourceId = req.params.resourceId;
-        const schedules = await scheduleService.findByResourceId(resourceId);
-        res.json(schedules);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
-    }
-});
-
-router.get('/user/:userId', async (req, res) => {
-    try {
-        const userId = req.params.userId;
-        const schedules = await scheduleService.findByUserId(userId);
-        res.json(schedules);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
-    }
-});
-
-
+router.use(errorMiddleware);
 
 module.exports = router;

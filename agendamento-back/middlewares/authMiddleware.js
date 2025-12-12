@@ -1,7 +1,7 @@
-const authService = require('../services/authService');
+const AuthService = require('../services/AuthService');
+const userRepository = require('../repositories/UserRepository');
 
-const express = require('express');
-const router = express.Router();
+const authServiceInstance = new AuthService(userRepository);
 
 exports.validateJWT = function (req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -12,10 +12,10 @@ exports.validateJWT = function (req, res, next) {
   }
 
   try {
-    const decoded = authService.verifyToken(token);
+    const decoded = authServiceInstance.verifyToken(token);
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({ message: error.message });
+    return res.status(error.statusCode || 403).json({ message: error.message });
   }
 };

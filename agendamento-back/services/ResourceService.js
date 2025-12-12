@@ -38,14 +38,6 @@ class ResourceService {
         }
         return true;
     }
-
-    createResourceDTO(resourceData) {
-        return {
-            name: resourceData.name,
-            quantity: resourceData.quantity,
-            isActive: resourceData.isActive
-        };
-    }
 }
 
 module.exports = ResourceService;
