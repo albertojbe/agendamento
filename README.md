@@ -1,25 +1,26 @@
 # Sistema de Agendamentos
 
-Sistema de agendamento de salas e recursos simples e direto criado como projeto para a disciplina Programação de Web.
+Sistema de agendamento de salas e recursos, desenvolvido para oferecer uma solução simples, objetiva e eficiente no gerenciamento de reservas. A aplicação permite o controle centralizado de horários, recursos disponíveis e agendamentos, proporcionando uma visualização clara e organizada das reservas por meio de uma interface intuitiva e interativa.
 
 ## Tecnologias
-- ExpressJS
-- VueJS
-- TalwindCSS
+- ExpressJS 
+- VueJS 
+- TailwindCSS
 - FlyonUI
-- SequelizeORM
-- FullCalendar
-- SQLite
-- JWT (autenticação)
-- bcrypt (criptografia de senhas)
+- Sequelize ORM 
+- FullCalendar 
+- SQLite 
+- JWT
+- bcrypt
 
 ## Arquitetura
 
 ### Backend
-Aplicação backend implementada em ExpressJS responsável pela lógica transacional do sistema, fornece uma API Restful para as funcionalidades do sistema. Utiliza arquitetura em camadas (Controller/Router → Service → Repository) com injeção de dependência e tratamento centralizado de erros.
+O backend é implementado em ExpressJS e é responsável por toda a lógica de negócio e operações transacionais do sistema. Ele disponibiliza uma API RESTful para consumo pelo frontend, garantindo comunicação padronizada e desacoplada.
 
 ### Frontend
-Interface simples e dinâmica implementada em VueJS, consome a API de agendamento através de requisições assíncronas e disponibiliza os dados de forma visual e interativa utilizando FullCalendar para visualização dos agendamentos.
+O frontend é desenvolvido em VueJS, oferecendo uma interface leve, responsiva e dinâmica. A aplicação consome a API backend por meio de requisições assíncronas, permitindo atualização dos dados em tempo real sem recarregamento de página.
+Os agendamentos são apresentados de forma visual e intuitiva utilizando o FullCalendar, facilitando a visualização de horários, disponibilidade de salas e organização dos recursos.
 
 ## Estrutura de Pastas
 
